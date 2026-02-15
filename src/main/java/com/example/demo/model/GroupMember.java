@@ -22,6 +22,11 @@ public class GroupMember {
     public GroupMember() {
     }
 
+    public GroupMember(ExpenseGroup group, MyUserDetails user) {
+        this.group = group;
+        this.user = user;
+    }
+
     public GroupMember(Long groupMemberId, ExpenseGroup group, MyUserDetails user, Long balance) {
         this.groupMemberId = groupMemberId;
         this.group = group;

@@ -1,12 +1,16 @@
 package com.example.demo.controller;
+
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
 
 import com.example.demo.model.User;
 import com.example.demo.repo.UserRepo;
@@ -15,7 +19,7 @@ import com.example.demo.services.UserService;
 
 @RestController
 public class AuthController {
-    
+
     @Autowired
     UserRepo userRepo;
 
@@ -27,23 +31,47 @@ public class AuthController {
     JwtService jwtService;
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody User user){
+    public ResponseEntity<Object> login(@RequestBody User user) {
         System.out.println(user);
-        if(userService.isCorrectCredential(user,authenticationManager)){
-             String jwtToken=jwtService.generateToken(user.getUsername());
-            return new ResponseEntity<>(jwtToken,HttpStatus.ACCEPTED);
+        if (userService.isCorrectCredential(user, authenticationManager)) {
+            String jwtAccessToken = jwtService.generateAccessToken(user.getUsername());
+            String jwtRefreshToken = jwtService.generateRefreshToken(user.getUsername());
+            return ResponseEntity.ok(
+                    Map.of("accessToken", jwtAccessToken, "refreshToken", jwtRefreshToken));
         }
-       return new ResponseEntity<>("Login failed!",HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>("Login failed!", HttpStatus.UNAUTHORIZED);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> addUser(@RequestBody User user){
+    public ResponseEntity<Map<String, String>> addUser(@RequestBody User user) {
         if (!userRepo.existsByUsername(user.getUsername())) {
             userService.registerUser(user);
-            String jwtToken=jwtService.generateToken(user.getUsername());
-            return new ResponseEntity<>(jwtToken,HttpStatus.CREATED);
+            String jwtAccessToken = jwtService.generateAccessToken(user.getUsername());
+            String jwtRefreshToken = jwtService.generateRefreshToken(user.getUsername());
+            return new ResponseEntity<>(
+                    Map.of("accessToken", jwtAccessToken, "refreshToken", jwtRefreshToken), HttpStatus.CREATED);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
+    @PostMapping("refresh")
+    public ResponseEntity<Map<String, String>> refresh(@RequestBody String refreshToken,
+            Authentication authentication) {
+        try {
+            String username = jwtService.extractUsername(refreshToken);
+            UserDetails userDetails = userRepo.findByUsername(username).get();
+            if (jwtService.validateToken(userDetails, refreshToken)) {
+                String accessToken = jwtService.generateAccessToken(username);
+                String newRefreshToken = jwtService.generateRefreshToken(username);
+                return ResponseEntity.ok(
+                        Map.of("accessToken", accessToken, "refreshToken", newRefreshToken));
+            }
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        } catch (Exception e) {
+            // TODO: handle exception
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+    }
 }
