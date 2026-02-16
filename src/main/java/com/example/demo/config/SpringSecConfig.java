@@ -16,7 +16,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.example.demo.services.UserService;
 
-
 @Configuration
 @EnableWebSecurity
 public class SpringSecConfig {
@@ -26,31 +25,37 @@ public class SpringSecConfig {
     JwtFilter filter;
 
     @Bean
-    public SecurityFilterChain getFilterChain(HttpSecurity http) throws Exception{
+    public SecurityFilterChain getFilterChain(HttpSecurity http) throws Exception {
         http
-        .csrf(csrf->csrf.disable())
-        .headers(headers->headers.disable())
-        .authorizeHttpRequests(
-            auth->
-            auth
-            .requestMatchers("/swagger-ui/**","/v3/**","/register","/login","/database/**").permitAll()
-            
-            .anyRequest().authenticated()
-        )
-        .httpBasic(httpconf->httpconf.disable())
-        .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
+                .csrf(csrf -> csrf.disable())
+                .headers(headers -> headers.disable())
+                .authorizeHttpRequests(
+                        auth -> auth
+                                .requestMatchers(
+                                        "/swagger-ui/**",
+                                        "/v3/**",
+                                        "/register",
+                                        "/login",
+                                        "/database/**",
+                                        "/refresh")
+                                .permitAll()
+
+                                .anyRequest().authenticated())
+                .httpBasic(httpconf -> httpconf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
     @Bean
-    public AuthenticationProvider authProvider(){
+    public AuthenticationProvider authProvider() {
         DaoAuthenticationProvider auth = new DaoAuthenticationProvider(userService);
         auth.setPasswordEncoder(new BCryptPasswordEncoder(12));
         return auth;
     }
+
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration){
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) {
         return authenticationConfiguration.getAuthenticationManager();
     }
 }
