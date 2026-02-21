@@ -1,42 +1,46 @@
 package com.example.demo.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.model.ExpenseGroup;
-import com.example.demo.model.GroupMember;
-import com.example.demo.model.MyUserDetails;
 import com.example.demo.repo.ExpenseGroupRepo;
-import com.example.demo.repo.UserRepo;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
-
-;
+import com.example.demo.services.ExpenseGroupService;
 
 @RestController
 @RequestMapping("group")
 public class ExpenseGroupController {
+
     @Autowired
     ExpenseGroupRepo groupRepo;
     @Autowired
-    UserRepo userRepo;
+    ExpenseGroupService groupService;
 
     @PostMapping("create")
-    public ResponseEntity<ExpenseGroup> createGroup(@RequestBody String groupName, Authentication authentication) {
-        ExpenseGroup group = new ExpenseGroup();
-        group.setGroupName(groupName);
-        List<GroupMember> members = group.getUsers();
-        MyUserDetails details = userRepo.findByUsername(authentication.getName()).get();
-        members.add(new GroupMember(group, details));
-        groupRepo.save(group);
-        return new ResponseEntity<>(group, HttpStatus.CREATED);
+    public ResponseEntity<ExpenseGroup> createGroup(@RequestParam String groupName, Authentication authentication) {
+        if (!groupRepo.existsByGroupName(groupName)) {
+            ExpenseGroup group = groupService.createGroup(groupName, authentication.getName());
+            return new ResponseEntity<>(group, HttpStatus.CREATED);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
+    @PutMapping("{id}/addMember")
+    public ResponseEntity<String> addUser(@PathVariable Long id, @RequestParam String username) {
+        try {
+            groupService.addMember(id, username);
+            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 }

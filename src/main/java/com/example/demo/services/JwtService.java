@@ -16,8 +16,8 @@ import io.jsonwebtoken.Jwts.SIG;
 @Service
 public class JwtService {
     KeyPair keyPair;
-    final long accessTokenValidity = 1000 * 60 * 3;
-    final long refreshTokenValidity = 1000 * 60 * 20;
+    final long accessTokenValidity = 1000 * 60 * 60;
+    final long refreshTokenValidity = 1000 * 60 * 60 * 24 * 2;
 
     public JwtService() {
         keyPair = SIG.ES256.keyPair().build();
@@ -25,7 +25,6 @@ public class JwtService {
 
     public String generateAccessToken(String username) {
         Map<String, Object> claim = new HashMap<>();
-        // TODO Auto-generated method stub
         return Jwts.builder()
                 .claims(claim)
                 .subject(username)
@@ -38,7 +37,6 @@ public class JwtService {
 
     public String generateRefreshToken(String username) {
         Map<String, Object> claim = new HashMap<>();
-        // TODO Auto-generated method stub
         return Jwts.builder()
                 .claims(claim)
                 .subject(username)
@@ -50,18 +48,15 @@ public class JwtService {
     }
 
     public String extractUsername(String token) {
-        // TODO Auto-generated method stub
         return extractClaim(token, Claims::getSubject);
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimResolver) {
-        // TODO Auto-generated method stub
         final Claims claims = extractAllClaims(token);
         return claimResolver.apply(claims);
     }
 
     private Claims extractAllClaims(String token) {
-        // TODO Auto-generated method stub
         return (Claims) Jwts.parser()
                 .verifyWith(keyPair.getPublic())
                 .build()
@@ -70,18 +65,15 @@ public class JwtService {
     }
 
     public boolean validateToken(UserDetails userDetails, String token) {
-        // TODO Auto-generated method stub
         final String username = extractUsername(token);
         return userDetails.getUsername().equalsIgnoreCase(username) && !isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {
-        // TODO Auto-generated method stub
         return extractExpiration(token).before(new Date());
     }
 
     private Date extractExpiration(String token) {
-        // TODO Auto-generated method stub
         return extractClaim(token, Claims::getExpiration);
     }
 

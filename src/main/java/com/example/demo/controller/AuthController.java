@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,7 +30,6 @@ public class AuthController {
     AuthenticationManager authenticationManager;
     @Autowired
     JwtService jwtService;
-    Map<String, String> refreshTokenHash = new HashMap<>();
 
     @PostMapping("/login")
     public ResponseEntity<Object> login(@RequestBody User user) {
@@ -39,7 +37,6 @@ public class AuthController {
         if (userService.isCorrectCredential(user, authenticationManager)) {
             String jwtAccessToken = jwtService.generateAccessToken(user.getUsername());
             String jwtRefreshToken = jwtService.generateRefreshToken(user.getUsername());
-            refreshTokenHash.put(user.getUsername(), jwtRefreshToken);
             return ResponseEntity.ok(
                     Map.of("accessToken", jwtAccessToken, "refreshToken", jwtRefreshToken));
         }
@@ -52,7 +49,6 @@ public class AuthController {
             userService.registerUser(user);
             String jwtAccessToken = jwtService.generateAccessToken(user.getUsername());
             String jwtRefreshToken = jwtService.generateRefreshToken(user.getUsername());
-            refreshTokenHash.put(user.getUsername(), jwtRefreshToken);
             return new ResponseEntity<>(
                     Map.of("accessToken", jwtAccessToken, "refreshToken", jwtRefreshToken), HttpStatus.CREATED);
         }
@@ -65,18 +61,15 @@ public class AuthController {
             String refreshToken = tokenWrapper.refreshToken;
             String username = jwtService.extractUsername(refreshToken);
             UserDetails userDetails = userRepo.findByUsername(username).get();
-            if (refreshTokenHash.getOrDefault(username, username).equals(refreshToken) &&
-                    jwtService.validateToken(userDetails, refreshToken)) {
+            if (jwtService.validateToken(userDetails, refreshToken)) {
                 String accessToken = jwtService.generateAccessToken(username);
                 String newRefreshToken = jwtService.generateRefreshToken(username);
-                refreshTokenHash.put(username, newRefreshToken);
                 return ResponseEntity.ok(
                         Map.of("accessToken", accessToken, "refreshToken", newRefreshToken));
             }
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         } catch (Exception e) {
-            // TODO: handle exception
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 

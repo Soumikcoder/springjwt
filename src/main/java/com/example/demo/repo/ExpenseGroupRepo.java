@@ -6,4 +6,6 @@ import com.example.demo.model.ExpenseGroup;
 
 public interface ExpenseGroupRepo extends JpaRepository<ExpenseGroup, Long> {
 
+    boolean existsByGroupName(String groupName);
+
 }
