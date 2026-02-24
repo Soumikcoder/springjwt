@@ -10,6 +10,7 @@ import com.example.demo.model.ExpenseGroup;
 import com.example.demo.model.GroupMember;
 import com.example.demo.model.MyUserDetails;
 import com.example.demo.repo.ExpenseGroupRepo;
+import com.example.demo.repo.GroupMemberRepo;
 import com.example.demo.repo.UserRepo;
 
 @Service
@@ -18,15 +19,17 @@ public class ExpenseGroupService {
     ExpenseGroupRepo groupRepo;
     @Autowired
     UserRepo userRepo;
+    @Autowired
+     GroupMemberRepo groupMemberRepo;
 
     public ExpenseGroup createGroup(String groupName, String username) {
         ExpenseGroup group = new ExpenseGroup();
         group.setGroupName(groupName);
-        List<GroupMember> members = new ArrayList<>();
+        
         MyUserDetails details = userRepo.findByUsername(username).get();
-        members.add(new GroupMember(group, details));
-        group.setUsers(members);
+        GroupMember member = new GroupMember(group,details);
         groupRepo.save(group);
+        groupMemberRepo.save(member);
         return group;
     }
 
