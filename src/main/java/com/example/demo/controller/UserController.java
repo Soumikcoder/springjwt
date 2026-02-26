@@ -20,8 +20,8 @@ public class UserController {
     @GetMapping("find")
     public ResponseEntity<Object> findUser(@RequestParam String username) {
         if (!userService.isExistsUsername(username)) {
-            return new ResponseEntity<>(HttpStatus.FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(HttpStatus.FOUND);
     }
 }
