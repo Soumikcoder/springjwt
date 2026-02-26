@@ -24,8 +24,8 @@ public class GroupMemberController {
     UserService userService;
     @GetMapping("all")
     public ResponseEntity<List<ExpenseGroup>> getGroupByUser(Authentication authentication) {
-        List<GroupMember> groupMembers = groupMemberRepo.findByUser(
-            userService.loadUserByUsername(authentication.getName())
+        List<GroupMember> groupMembers = groupMemberRepo.findByUserUsername(
+            authentication.getName()
         );
         List<ExpenseGroup> groups = groupMembers.stream().map(GroupMember::getGroup).toList();
         return new ResponseEntity<>(groups, HttpStatus.OK);
