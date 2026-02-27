@@ -21,26 +21,23 @@ public class MyUserDetails implements UserDetails {
     private Long userId;
 
     private String username;
-    
+
     private String password;
 
-     public MyUserDetails() {
+    public MyUserDetails() {
     }
 
+    public MyUserDetails(User user) {
+        this.username = user.username;
+        this.password = user.password;
 
-     public MyUserDetails(User user) {
-        this.username=user.username;
-        this.password=user.password;
-        
     }
 
-
-     @Override
+    @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // TODO Auto-generated method stub
         return Collections.singleton(new SimpleGrantedAuthority("USER"));
     }
-   
 
     @Override
     public @Nullable String getPassword() {

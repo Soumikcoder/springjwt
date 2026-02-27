@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.dto.GroupMemberResponseDTO;
 import com.example.demo.model.ExpenseGroup;
 import com.example.demo.repo.ExpenseGroupRepo;
 
@@ -46,12 +47,21 @@ public class ExpenseGroupController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    
+
+    @GetMapping("{id}/members")
+    public ResponseEntity<List<GroupMemberResponseDTO>> getMembers(@PathVariable Long id) {
+        try {
+            return new ResponseEntity<>(groupService.getMembers(id), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     @GetMapping("{id}")
     public ResponseEntity<ExpenseGroup> getGroup(@PathVariable Long id) {
         return groupRepo.findById(id)
                 .map(group -> new ResponseEntity<>(group, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
-    
+
 }

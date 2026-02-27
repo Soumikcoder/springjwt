@@ -8,14 +8,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.services.TokenService;
 import com.example.demo.services.UserService;
 
 @RestController
-@RequestMapping("users")
+@RequestMapping("user")
 public class UserController {
 
     @Autowired
     UserService userService;
+    @Autowired
+    TokenService tokenService;
 
     @GetMapping("find")
     public ResponseEntity<Object> findUser(@RequestParam String username) {
@@ -24,4 +27,5 @@ public class UserController {
         }
         return new ResponseEntity<>(HttpStatus.FOUND);
     }
+
 }

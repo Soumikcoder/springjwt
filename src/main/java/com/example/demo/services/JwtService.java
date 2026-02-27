@@ -1,10 +1,21 @@
 package com.example.demo.services;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.KeyFactory;
 import java.security.KeyPair;
-import java.security.SecureRandom;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.function.Function;
 
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,12 +27,66 @@ import io.jsonwebtoken.Jwts.SIG;
 
 @Service
 public class JwtService {
+    private static final String FILE_NAME = "JWT-keys.properties";
     KeyPair keyPair;
     final long accessTokenValidity = 1000 * 60 * 60;
     final long refreshTokenValidity = 1000 * 60 * 60 * 24 * 2;
-    public static final byte[] SEED = new byte[] { (byte)0x12, (byte)0x34, (byte)0x56, (byte)0x78, (byte)0x9A, (byte)0xBC, (byte)0xDE, (byte)0xF0, (byte)0x11, (byte)0x22, (byte)0x33, (byte)0x44, (byte)0x55, (byte)0x66, (byte)0x77, (byte)0x88, (byte)0x99, (byte)0xAA, (byte)0xBB, (byte)0xCC, (byte)0xDD, (byte)0xEE, (byte)0xFF, (byte)0x00, (byte)0xAB, (byte)0xCD, (byte)0xEF, (byte)0x12, (byte)0x34, (byte)0x56, (byte)0x78, (byte)0x90 };
+
     public JwtService() {
-        keyPair = SIG.ES256.keyPair().random(new SecureRandom(SEED)).build();
+        try {
+            Path path = Paths.get(FILE_NAME);
+
+            if (Files.exists(path)) {
+                loadKeysFromFile(path);
+                System.out.println("Loaded keys from file");
+            } else {
+                generateAndSaveKeys(path);
+                System.out.println("Getnerated and Saved keys");
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to initialize keys", e);
+        }
+    }
+
+    private void generateAndSaveKeys(Path path) throws Exception {
+
+        keyPair = SIG.ES256.keyPair().build();
+
+        Properties props = new Properties();
+        String publicKey = Base64.getEncoder()
+                .encodeToString(keyPair.getPublic().getEncoded());
+        String privateKey = Base64.getEncoder()
+                .encodeToString(keyPair.getPrivate().getEncoded());
+
+        props.setProperty("public", publicKey);
+        props.setProperty("private", privateKey);
+
+        try (OutputStream os = Files.newOutputStream(path)) {
+            props.store(os, "JWT Keys");
+        }
+    }
+
+    private void loadKeysFromFile(Path path) throws Exception {
+
+        Properties props = new Properties();
+
+        try (InputStream is = Files.newInputStream(path)) {
+            props.load(is);
+        }
+
+        byte[] publicBytes = Base64.getDecoder().decode(props.getProperty("public"));
+        byte[] privateBytes = Base64.getDecoder().decode(props.getProperty("private"));
+
+        KeyFactory keyFactory = KeyFactory.getInstance("EC");
+
+        PublicKey publicKey = keyFactory.generatePublic(
+                new X509EncodedKeySpec(publicBytes));
+
+        PrivateKey privateKey = keyFactory.generatePrivate(
+                new PKCS8EncodedKeySpec(privateBytes));
+
+        keyPair = new KeyPair(publicKey, privateKey);
     }
 
     public String generateAccessToken(String username) {

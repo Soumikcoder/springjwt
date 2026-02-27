@@ -34,12 +34,9 @@ public class SpringSecConfig {
                                 .requestMatchers(
                                         "/swagger-ui/**",
                                         "/v3/**",
-                                        "/register",
-                                        "/login",
-                                        "/database/**",
-                                        "/refresh")
+                                        "/auth/**",
+                                        "/database/**")
                                 .permitAll()
-
                                 .anyRequest().authenticated())
                 .httpBasic(httpconf -> httpconf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
