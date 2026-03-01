@@ -1,6 +1,7 @@
 package com.example.demo.services;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -54,5 +55,17 @@ public class ExpenseGroupService {
 
         }
         return null;
+    }
+
+    public boolean existsByGroupName(String groupName) {
+        return groupRepo.existsByGroupName(groupName);
+    }
+
+    public boolean existsByGroupID(Long id) {
+        return groupRepo.existsById(id);
+    }
+
+    public Optional<ExpenseGroup> getGroupByID(Long id) {
+        return groupRepo.findById(id);
     }
 }

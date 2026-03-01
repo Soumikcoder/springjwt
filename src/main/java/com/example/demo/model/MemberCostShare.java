@@ -15,16 +15,29 @@ public class MemberCostShare {
     GroupMember groupMember;
     @ManyToOne
     ExpenseGroup group;
+    @ManyToOne
+    Transactions transaction;
     Long dept;
 
     public MemberCostShare() {
     }
 
-    public MemberCostShare(Long memberCostShareId, GroupMember groupMember, ExpenseGroup group, Long dept) {
+    public MemberCostShare(Long memberCostShareId, GroupMember groupMember, ExpenseGroup group,
+            Transactions transaction,
+            Long dept) {
         this.memberCostShareId = memberCostShareId;
         this.groupMember = groupMember;
         this.group = group;
+        this.transaction = transaction;
         this.dept = dept;
+    }
+
+    public Transactions getTransaction() {
+        return transaction;
+    }
+
+    public void setTransaction(Transactions transaction) {
+        this.transaction = transaction;
     }
 
     public Long getMemberCostShareId() {

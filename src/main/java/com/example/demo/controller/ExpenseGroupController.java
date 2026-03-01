@@ -25,13 +25,11 @@ import com.example.demo.services.ExpenseGroupService;
 public class ExpenseGroupController {
 
     @Autowired
-    ExpenseGroupRepo groupRepo;
-    @Autowired
     ExpenseGroupService groupService;
 
     @PostMapping("create")
     public ResponseEntity<ExpenseGroup> createGroup(@RequestParam String groupName, Authentication authentication) {
-        if (!groupRepo.existsByGroupName(groupName)) {
+        if (!groupService.existsByGroupName(groupName)) {
             ExpenseGroup group = groupService.createGroup(groupName, authentication.getName());
             return new ResponseEntity<>(group, HttpStatus.CREATED);
         }
@@ -59,7 +57,7 @@ public class ExpenseGroupController {
 
     @GetMapping("{id}")
     public ResponseEntity<ExpenseGroup> getGroup(@PathVariable Long id) {
-        return groupRepo.findById(id)
+        return groupService.getGroupByID(id)
                 .map(group -> new ResponseEntity<>(group, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }

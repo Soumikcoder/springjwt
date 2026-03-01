@@ -15,23 +15,19 @@ public class Transactions {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long transactionId;
     @ManyToOne
-    MyUserDetails paidBy;
+    GroupMember paidBy;
     @ManyToOne
     ExpenseGroup group;
     Long amount;
-    @OneToMany
-    List<MemberCostShare> shares;
 
     public Transactions() {
     }
 
-    public Transactions(Long transactionId, MyUserDetails paidBy, ExpenseGroup group, Long amount,
-            List<MemberCostShare> shares) {
+    public Transactions(Long transactionId, GroupMember paidBy, ExpenseGroup group, Long amount) {
         this.transactionId = transactionId;
         this.paidBy = paidBy;
         this.group = group;
         this.amount = amount;
-        this.shares = shares;
     }
 
     public Long getTransactionId() {
@@ -42,11 +38,11 @@ public class Transactions {
         this.transactionId = transactionId;
     }
 
-    public MyUserDetails getPaidBy() {
+    public GroupMember getPaidBy() {
         return paidBy;
     }
 
-    public void setPaidBy(MyUserDetails paidBy) {
+    public void setPaidBy(GroupMember paidBy) {
         this.paidBy = paidBy;
     }
 
@@ -64,14 +60,6 @@ public class Transactions {
 
     public void setAmount(Long amount) {
         this.amount = amount;
-    }
-
-    public List<MemberCostShare> getShares() {
-        return shares;
-    }
-
-    public void setShares(List<MemberCostShare> shares) {
-        this.shares = shares;
     }
 
 }
