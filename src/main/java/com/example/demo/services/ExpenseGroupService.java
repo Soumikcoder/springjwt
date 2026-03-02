@@ -68,4 +68,13 @@ public class ExpenseGroupService {
     public Optional<ExpenseGroup> getGroupByID(Long id) {
         return groupRepo.findById(id);
     }
+
+    public void deleteGroup(Long id) {
+        if (groupRepo.existsById(id)) {
+            groupRepo.deleteById(id);   
+        }
+        else {
+            throw new IllegalArgumentException("Group with id: " + id + " does not exist");
+        }
+    }
 }

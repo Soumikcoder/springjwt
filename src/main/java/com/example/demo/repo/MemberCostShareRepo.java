@@ -12,6 +12,7 @@ public interface MemberCostShareRepo extends JpaRepository<MemberCostShare, Long
 
     List<MemberCostShare> findByGroupGroupId(Long groupId);
 
+
     List<MemberCostShare> findByTransactionTransactionId(Long transactionId);
 
 }

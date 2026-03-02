@@ -66,5 +66,8 @@ public class GroupMember {
     public void setBalance(Long balance) {
         this.balance = balance;
     }
-
+    public String toString() {
+        return "GroupMember [groupMemberId=" + groupMemberId + ", group=" + group.getGroupName() + ", user="
+                + user.getUsername() + ", balance=" + balance + "]";
+    }
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.model.GroupMember;
 import com.example.demo.repo.GroupMemberRepo;
@@ -20,9 +21,10 @@ public class GroupMemberService {
     public boolean existsByGroupIdAndMemberId(Long groupId, Long memberId) {
         return groupMemberRepo.existsByGroupGroupIdAndGroupMemberId(groupId, memberId);
     }
-
+    @Transactional
     public void addBalanaceToMember(Long groupId, Long memberId, Long amount) {
         if (existsByGroupIdAndMemberId(groupId, memberId)) {
+            System.out.println("Adding balance to member with id: " + memberId + " in group with id: " + groupId + " amount: " + amount);
             groupMemberRepo.findById(memberId).ifPresent(
                     groupMember -> groupMember.setBalance(groupMember.getBalance() + amount));
         }

@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.dto.CostShareDTO;
 import com.example.demo.model.ExpenseGroup;
 import com.example.demo.model.GroupMember;
 import com.example.demo.model.MemberCostShare;
@@ -27,20 +28,21 @@ public class MemberCostShareService {
         Long amount = transaction.getAmount();
         List<GroupMember> groupMembers = groupMemberService.getGroupMembersByGroupId(groupId);
         Long share = amount / groupMembers.size();
-        paidBy.setBalance(amount - share);
-        groupMemberService.addBalanaceToMember(groupId, paidBy.getGroupMemberId(), amount - share);
+        paidBy.setBalance(paidBy.getBalance()+amount - share);
         List<MemberCostShare> memberCostShares = new ArrayList<>();
+        ExpenseGroup group = transaction.getGroup();
+        System.out.println(groupMembers);
         groupMembers.forEach(member -> {
             MemberCostShare memberCostShare = new MemberCostShare();
-            memberCostShare.setGroupMember(paidBy);
+            memberCostShare.setGroupMember(member);
             memberCostShare.setTransaction(transaction);
             memberCostShares.add(memberCostShare);
+            memberCostShare.setGroup(group);
             if (member.getGroupMemberId().equals(paidBy.getGroupMemberId())) {
-                memberCostShare.setDept(amount - share);
                 return;
             }
             memberCostShare.setDept(-share);
-            groupMemberService.addBalanaceToMember(groupId, member.getGroupMemberId(), -share);
+            member.setBalance(member.getBalance()-share);
 
         });
 
@@ -51,11 +53,22 @@ public class MemberCostShareService {
     }
 
     // TODO: write controller for this service and test it
-    public List<MemberCostShare> getMemberCostSharesByGroupId(Long groupId) {
-        return memberCostShareRepo.findByGroupGroupId(groupId);
+    
+
+    public List<CostShareDTO> getMemberCostSharesByTransactionId(Long transactionId) {
+        return memberCostShareRepo.findByTransactionTransactionId(transactionId).stream()
+        .map(member->
+            {
+                CostShareDTO costShareDTO=new CostShareDTO();
+                costShareDTO.setDept(member.getDept());
+                costShareDTO.setGroupId(member.getGroup().getGroupId());
+                costShareDTO.setMemberId(member.getGroupMember().getGroupMemberId());
+                costShareDTO.setMemberName(member.getGroupMember().getUser().getUsername());
+                costShareDTO.setTransactionId(transactionId);
+                return costShareDTO;
+            }
+        ).toList();
     }
 
-    public List<MemberCostShare> getMemberCostSharesByTransactionId(Long transactionId) {
-        return memberCostShareRepo.findByTransactionTransactionId(transactionId);
-    }
+
 }
