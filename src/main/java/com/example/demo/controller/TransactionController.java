@@ -1,5 +1,7 @@
 package com.example.demo.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -12,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.dto.TransactionDTO;
+import com.example.demo.dto.TransactionRequestDTO;
+import com.example.demo.dto.TransactionResponseDTO;
+import com.example.demo.model.Transactions;
 import com.example.demo.services.TransactionService;
 
 @RestController
@@ -22,7 +26,7 @@ public class TransactionController {
     TransactionService transactionService;
 
     @GetMapping("all")
-    public ResponseEntity<?> getAllTransactions(@PathVariable Long groupId) {
+    public ResponseEntity<List<TransactionResponseDTO>> getAllTransactions(@PathVariable Long groupId) {
         try {
             return new ResponseEntity<>(transactionService.getTransactionsByGroupId(groupId), HttpStatus.OK);
         } catch (Exception e) {
@@ -32,14 +36,14 @@ public class TransactionController {
     }
 
     @PostMapping("add")
-    public ResponseEntity<TransactionDTO> addTransaction(
-            @PathVariable Long groupId, @RequestBody TransactionDTO transactionDTO) {
+    public ResponseEntity<TransactionRequestDTO> addTransaction(
+            @PathVariable Long groupId, @RequestBody TransactionRequestDTO transactionRequestDTO) {
         try {
 
-            transactionService.addTransactions(groupId, transactionDTO);
-            return new ResponseEntity<>(transactionDTO, HttpStatus.CREATED);
+            transactionService.addTransactions(groupId, transactionRequestDTO);
+            return new ResponseEntity<>(transactionRequestDTO, HttpStatus.CREATED);
         } catch (Exception e) {
-            System.out.println("Adding transaction: " + transactionDTO);
+            System.out.println("Adding transaction: " + transactionRequestDTO);
             System.out.println("Error adding transaction: " + e.getMessage());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -59,11 +63,12 @@ public class TransactionController {
     }
 
     @PostMapping("{transactionId}/update")
-    public ResponseEntity<TransactionDTO> updateTransaction(
-            @PathVariable Long groupId, @PathVariable Long transactionId, @RequestBody TransactionDTO transactionDTO) {
+    public ResponseEntity<TransactionRequestDTO> updateTransaction(
+            @PathVariable Long groupId, @PathVariable Long transactionId,
+            @RequestBody TransactionRequestDTO transactionRequestDTO) {
         try {
-            transactionService.updateTransaction(groupId, transactionId, transactionDTO);
-            return new ResponseEntity<>(transactionDTO, HttpStatus.OK);
+            transactionService.updateTransaction(groupId, transactionId, transactionRequestDTO);
+            return new ResponseEntity<>(transactionRequestDTO, HttpStatus.OK);
         } catch (Exception e) {
             System.out.println("Error updating transaction: " + e.getMessage());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

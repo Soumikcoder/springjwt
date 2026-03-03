@@ -1,7 +1,12 @@
 package com.example.demo.model;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+import org.hibernate.annotations.CreationTimestamp;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,24 +19,30 @@ public class Transactions {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long transactionId;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     GroupMember paidBy;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     ExpenseGroup group;
     Long amount;
+
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime payedAt;
 
     public Transactions() {
     }
 
-    public Transactions(Long transactionId, GroupMember paidBy, ExpenseGroup group, Long amount) {
+    public Long getTransactionId() {
+        return transactionId;
+    }
+
+    public Transactions(Long transactionId, GroupMember paidBy, ExpenseGroup group, Long amount,
+            LocalDateTime payedAt) {
         this.transactionId = transactionId;
         this.paidBy = paidBy;
         this.group = group;
         this.amount = amount;
-    }
-
-    public Long getTransactionId() {
-        return transactionId;
+        this.payedAt = payedAt;
     }
 
     public void setTransactionId(Long transactionId) {
@@ -56,6 +67,14 @@ public class Transactions {
 
     public Long getAmount() {
         return amount;
+    }
+
+    public LocalDateTime getPayedAt() {
+        return payedAt;
+    }
+
+    public void setPayedAt(LocalDateTime payedAt) {
+        this.payedAt = payedAt;
     }
 
     public void setAmount(Long amount) {

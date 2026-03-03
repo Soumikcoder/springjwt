@@ -1,5 +1,6 @@
 package com.example.demo.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -11,11 +12,11 @@ public class MemberCostShare {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long memberCostShareId;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     GroupMember groupMember;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     ExpenseGroup group;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     Transactions transaction;
     Long dept;
 

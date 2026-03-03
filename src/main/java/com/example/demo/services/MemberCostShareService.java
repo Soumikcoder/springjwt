@@ -28,7 +28,7 @@ public class MemberCostShareService {
         Long amount = transaction.getAmount();
         List<GroupMember> groupMembers = groupMemberService.getGroupMembersByGroupId(groupId);
         Long share = amount / groupMembers.size();
-        paidBy.setBalance(paidBy.getBalance()+amount - share);
+        paidBy.setBalance(paidBy.getBalance() + amount - share);
         List<MemberCostShare> memberCostShares = new ArrayList<>();
         ExpenseGroup group = transaction.getGroup();
         System.out.println(groupMembers);
@@ -39,10 +39,11 @@ public class MemberCostShareService {
             memberCostShares.add(memberCostShare);
             memberCostShare.setGroup(group);
             if (member.getGroupMemberId().equals(paidBy.getGroupMemberId())) {
+                memberCostShare.setDept(amount - share);
                 return;
             }
             memberCostShare.setDept(-share);
-            member.setBalance(member.getBalance()-share);
+            member.setBalance(member.getBalance() - share);
 
         });
 
@@ -53,22 +54,18 @@ public class MemberCostShareService {
     }
 
     // TODO: write controller for this service and test it
-    
 
     public List<CostShareDTO> getMemberCostSharesByTransactionId(Long transactionId) {
         return memberCostShareRepo.findByTransactionTransactionId(transactionId).stream()
-        .map(member->
-            {
-                CostShareDTO costShareDTO=new CostShareDTO();
-                costShareDTO.setDept(member.getDept());
-                costShareDTO.setGroupId(member.getGroup().getGroupId());
-                costShareDTO.setMemberId(member.getGroupMember().getGroupMemberId());
-                costShareDTO.setMemberName(member.getGroupMember().getUser().getUsername());
-                costShareDTO.setTransactionId(transactionId);
-                return costShareDTO;
-            }
-        ).toList();
+                .map(member -> {
+                    CostShareDTO costShareDTO = new CostShareDTO();
+                    costShareDTO.setDept(member.getDept());
+                    costShareDTO.setGroupId(member.getGroup().getGroupId());
+                    costShareDTO.setMemberId(member.getGroupMember().getGroupMemberId());
+                    costShareDTO.setMemberName(member.getGroupMember().getUser().getUsername());
+                    costShareDTO.setTransactionId(transactionId);
+                    return costShareDTO;
+                }).toList();
     }
-
 
 }

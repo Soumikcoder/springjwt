@@ -1,10 +1,10 @@
 package com.example.demo.dto;
 
-public class TransactionDTO {
+public class TransactionRequestDTO {
     private Long payeeId;
     private Long amount;
 
-    public TransactionDTO(Long payeeId, Long amount) {
+    public TransactionRequestDTO(Long payeeId, Long amount) {
         this.payeeId = payeeId;
         this.amount = amount;
     }

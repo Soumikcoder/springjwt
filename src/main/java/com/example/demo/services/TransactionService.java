@@ -5,7 +5,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.example.demo.dto.TransactionDTO;
+import com.example.demo.dto.TransactionRequestDTO;
+import com.example.demo.dto.TransactionResponseDTO;
 import com.example.demo.model.ExpenseGroup;
 import com.example.demo.model.Transactions;
 import com.example.demo.repo.TransactionsRepo;
@@ -22,7 +23,7 @@ public class TransactionService {
     @Autowired
     MemberCostShareService memberCostShareService;
 
-    public void addTransactions(Long groupId, TransactionDTO transactionDTO) throws Exception {
+    public void addTransactions(Long groupId, TransactionRequestDTO transactionDTO) throws Exception {
         if (!expenseGroupService.existsByGroupID(groupId)) {
             throw new IllegalArgumentException("Group does not exist");
         }
@@ -44,8 +45,18 @@ public class TransactionService {
         memberCostShareService.addCostShareToMember(transaction);
     }
 
-    public List<Transactions> getTransactionsByGroupId(Long groupId) {
-        return transactionRepo.findByGroupGroupId(groupId);
+    public List<TransactionResponseDTO> getTransactionsByGroupId(Long groupId) {
+        return transactionRepo.findByGroupGroupId(groupId).stream()
+                .map(
+                        transaction -> {
+                            TransactionResponseDTO transactionResponseDTO = new TransactionResponseDTO();
+                            transactionResponseDTO.setTransactionId(transaction.getTransactionId());
+                            transactionResponseDTO.setAmount(transaction.getAmount());
+                            transactionResponseDTO.setPayeeId(transaction.getPaidBy().getGroupMemberId());
+                            transactionResponseDTO.setPayeeName(transaction.getPaidBy().getUser().getUsername());
+                            return transactionResponseDTO;
+                        })
+                .toList();
     }
 
     public void removeTransaction(Long transactionId) {
@@ -53,7 +64,7 @@ public class TransactionService {
         throw new UnsupportedOperationException("Unimplemented method 'removeTransaction'");
     }
 
-    public void updateTransaction(Long groupId, Long transactionId, TransactionDTO transactionDTO) {
+    public void updateTransaction(Long groupId, Long transactionId, TransactionRequestDTO transactionDTO) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'updateTransaction'");
     }

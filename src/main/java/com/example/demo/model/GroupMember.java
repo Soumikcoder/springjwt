@@ -1,5 +1,8 @@
 package com.example.demo.model;
 
+import org.hibernate.engine.internal.Cascade;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,7 +15,7 @@ public class GroupMember {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long groupMemberId;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     ExpenseGroup group;
 
     @ManyToOne
@@ -66,6 +69,7 @@ public class GroupMember {
     public void setBalance(Long balance) {
         this.balance = balance;
     }
+
     public String toString() {
         return "GroupMember [groupMemberId=" + groupMemberId + ", group=" + group.getGroupName() + ", user="
                 + user.getUsername() + ", balance=" + balance + "]";

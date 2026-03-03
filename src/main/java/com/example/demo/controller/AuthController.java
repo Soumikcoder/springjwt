@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.model.RefreshTokenWrapper;
+import com.example.demo.dto.RefreshTokenDTO;
 import com.example.demo.model.User;
 import com.example.demo.repo.UserRepo;
 import com.example.demo.services.TokenService;
@@ -59,7 +59,7 @@ public class AuthController {
     }
 
     @PostMapping("refresh")
-    public ResponseEntity<Map<String, String>> refresh(@RequestBody RefreshTokenWrapper tokenWrapper) {
+    public ResponseEntity<Map<String, String>> refresh(@RequestBody RefreshTokenDTO tokenWrapper) {
         try {
             String refreshToken = tokenWrapper.refreshToken;
 
