@@ -3,6 +3,7 @@ package com.example.demo.services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.TransactionRequestDTO;
@@ -23,12 +24,17 @@ public class TransactionService {
     @Autowired
     MemberCostShareService memberCostShareService;
 
-    public void addTransactions(Long groupId, TransactionRequestDTO transactionDTO) throws Exception {
+    public void addTransactions(Long groupId, TransactionRequestDTO transactionDTO
+        ,Authentication authentication) throws Exception {
         if (!expenseGroupService.existsByGroupID(groupId)) {
             throw new IllegalArgumentException("Group does not exist");
         }
         ExpenseGroup group = expenseGroupService.getGroupByID(groupId).orElseThrow();
         Long payeeId = transactionDTO.getPayeeId();
+        if (!groupMemberService.isSamePayeeAndLoggedUser(payeeId,authentication)) {
+            throw new IllegalArgumentException("Payee does not match the authenticated user" +
+                    "\n Payee id: " + payeeId + "\n Authenticated user id: " + authentication.getName());
+        }
         if (!groupMemberService.existsByGroupIdAndMemberId(groupId, payeeId)) {
             throw new IllegalArgumentException("Payee is not a member of the group" +
                     "\n Payee id: " + payeeId + "\n Group id: " + groupId);

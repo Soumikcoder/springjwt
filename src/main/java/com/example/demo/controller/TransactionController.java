@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.TransactionRequestDTO;
 import com.example.demo.dto.TransactionResponseDTO;
-import com.example.demo.model.Transactions;
 import com.example.demo.services.TransactionService;
 
 @RestController
@@ -37,13 +36,15 @@ public class TransactionController {
 
     @PostMapping("add")
     public ResponseEntity<TransactionRequestDTO> addTransaction(
-            @PathVariable Long groupId, @RequestBody TransactionRequestDTO transactionRequestDTO) {
+            @PathVariable Long groupId, @RequestBody TransactionRequestDTO transactionDTO,
+            Authentication authentication
+        ) {
         try {
 
-            transactionService.addTransactions(groupId, transactionRequestDTO);
-            return new ResponseEntity<>(transactionRequestDTO, HttpStatus.CREATED);
+            transactionService.addTransactions(groupId, transactionDTO, authentication);
+            return new ResponseEntity<>(transactionDTO, HttpStatus.CREATED);
         } catch (Exception e) {
-            System.out.println("Adding transaction: " + transactionRequestDTO);
+            System.out.println("Adding transaction: " + transactionDTO);
             System.out.println("Error adding transaction: " + e.getMessage());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

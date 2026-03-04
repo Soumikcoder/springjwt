@@ -12,6 +12,7 @@ import com.example.demo.model.GroupMember;
 import com.example.demo.model.MyUserDetails;
 import com.example.demo.repo.ExpenseGroupRepo;
 import com.example.demo.repo.GroupMemberRepo;
+import com.example.demo.utils.GroupMemberResonseMapper;
 
 @Service
 public class ExpenseGroupService {
@@ -48,11 +49,9 @@ public class ExpenseGroupService {
 
     public List<GroupMemberResponseDTO> getMembers(Long id) {
         if (groupRepo.existsById(id)) {
-            List<GroupMember> members = groupMemberRepo.findByGroupGroupId(id);
-            return members.stream().map(member -> new GroupMemberResponseDTO(
-                    member.getGroupMemberId(), member.getUser().getUsername(), member.getBalance()))
-                    .toList();
-
+            return groupMemberRepo.findByGroupGroupId(id).stream()
+            .map(GroupMemberResonseMapper::tGroupMemberResponseDTO)
+            .toList();
         }
         return null;
     }

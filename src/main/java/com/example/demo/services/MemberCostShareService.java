@@ -12,8 +12,8 @@ import com.example.demo.model.GroupMember;
 import com.example.demo.model.MemberCostShare;
 import com.example.demo.model.Transactions;
 import com.example.demo.repo.MemberCostShareRepo;
+import com.example.demo.utils.CostShareMapper;
 
-import jakarta.transaction.Transaction;
 
 @Service
 public class MemberCostShareService {
@@ -57,15 +57,7 @@ public class MemberCostShareService {
 
     public List<CostShareDTO> getMemberCostSharesByTransactionId(Long transactionId) {
         return memberCostShareRepo.findByTransactionTransactionId(transactionId).stream()
-                .map(member -> {
-                    CostShareDTO costShareDTO = new CostShareDTO();
-                    costShareDTO.setDept(member.getDept());
-                    costShareDTO.setGroupId(member.getGroup().getGroupId());
-                    costShareDTO.setMemberId(member.getGroupMember().getGroupMemberId());
-                    costShareDTO.setMemberName(member.getGroupMember().getUser().getUsername());
-                    costShareDTO.setTransactionId(transactionId);
-                    return costShareDTO;
-                }).toList();
+        .map(CostShareMapper::toCostShareDTO).toList();
     }
 
 }
