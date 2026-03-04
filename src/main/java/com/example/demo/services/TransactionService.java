@@ -11,6 +11,7 @@ import com.example.demo.dto.TransactionResponseDTO;
 import com.example.demo.model.ExpenseGroup;
 import com.example.demo.model.Transactions;
 import com.example.demo.repo.TransactionsRepo;
+import com.example.demo.utils.TransactionMapper;
 
 @Service
 public class TransactionService {
@@ -53,15 +54,7 @@ public class TransactionService {
 
     public List<TransactionResponseDTO> getTransactionsByGroupId(Long groupId) {
         return transactionRepo.findByGroupGroupId(groupId).stream()
-                .map(
-                        transaction -> {
-                            TransactionResponseDTO transactionResponseDTO = new TransactionResponseDTO();
-                            transactionResponseDTO.setTransactionId(transaction.getTransactionId());
-                            transactionResponseDTO.setAmount(transaction.getAmount());
-                            transactionResponseDTO.setPayeeId(transaction.getPaidBy().getGroupMemberId());
-                            transactionResponseDTO.setPayeeName(transaction.getPaidBy().getUser().getUsername());
-                            return transactionResponseDTO;
-                        })
+                .map(TransactionMapper::toTransactionResponseDTO)  
                 .toList();
     }
 
