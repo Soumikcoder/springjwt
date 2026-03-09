@@ -3,9 +3,10 @@ package com.example.demo.services;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.Exception.AppException;
 import com.example.demo.dto.GroupMemberResponseDTO;
 import com.example.demo.model.ExpenseGroup;
 import com.example.demo.model.GroupMember;
@@ -14,16 +15,20 @@ import com.example.demo.repo.ExpenseGroupRepo;
 import com.example.demo.repo.GroupMemberRepo;
 import com.example.demo.utils.GroupMemberResonseMapper;
 
+import lombok.AllArgsConstructor;
+
 @Service
+@AllArgsConstructor
 public class ExpenseGroupService {
-    @Autowired
     ExpenseGroupRepo groupRepo;
-    @Autowired
     GroupMemberRepo groupMemberRepo;
-    @Autowired
     UserService userService;
 
     public ExpenseGroup createGroup(String groupName, String username) {
+        if (groupName==null || username == null) {
+            throw new AppException("Groupname & Username can not be null!",
+            HttpStatus.BAD_REQUEST);
+        }
         ExpenseGroup group = new ExpenseGroup();
         group.setGroupName(groupName);
 
@@ -34,7 +39,7 @@ public class ExpenseGroupService {
         return group;
     }
 
-    public boolean addMember(Long id, String username) {
+    public void addMember(Long id, String username) {
         if (userService.isExistsUsername(username)
                 &&
                 groupRepo.existsById(id)) {
@@ -42,9 +47,10 @@ public class ExpenseGroupService {
             MyUserDetails details = userService.loadUserByUsername(username);
             GroupMember member = new GroupMember(group, details);
             groupMemberRepo.save(member);
-            return true;
         }
-        return false;
+       throw new AppException(
+        String.format("Group ID %d or Username %s does not exist!",id, username),
+        HttpStatus.BAD_REQUEST);
     }
 
     public List<GroupMemberResponseDTO> getMembers(Long id) {
@@ -53,7 +59,7 @@ public class ExpenseGroupService {
             .map(GroupMemberResonseMapper::tGroupMemberResponseDTO)
             .toList();
         }
-        return null;
+        throw new AppException("Group not found", HttpStatus.NOT_FOUND);
     }
 
     public boolean existsByGroupName(String groupName) {
@@ -73,7 +79,8 @@ public class ExpenseGroupService {
             groupRepo.deleteById(id);   
         }
         else {
-            throw new IllegalArgumentException("Group with id: " + id + " does not exist");
+            throw new AppException("Group with id: " + id + " does not exist", 
+            HttpStatus.NOT_FOUND);
         }
     }
 }

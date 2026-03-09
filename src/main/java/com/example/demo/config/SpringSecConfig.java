@@ -23,7 +23,7 @@ public class SpringSecConfig {
     UserService userService;
     @Autowired
     JwtFilter filter;
-
+    
     @Bean
     public SecurityFilterChain getFilterChain(HttpSecurity http) throws Exception {
         http

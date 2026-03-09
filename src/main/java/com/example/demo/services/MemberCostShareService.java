@@ -3,9 +3,10 @@ package com.example.demo.services;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.Exception.AppException;
 import com.example.demo.dto.CostShareDTO;
 import com.example.demo.model.ExpenseGroup;
 import com.example.demo.model.GroupMember;
@@ -14,15 +15,20 @@ import com.example.demo.model.Transactions;
 import com.example.demo.repo.MemberCostShareRepo;
 import com.example.demo.utils.CostShareMapper;
 
+import lombok.AllArgsConstructor;
+
 
 @Service
+@AllArgsConstructor
 public class MemberCostShareService {
-    @Autowired
     MemberCostShareRepo memberCostShareRepo;
-    @Autowired
     GroupMemberService groupMemberService;
 
     public void addCostShareToMember(Transactions transaction) {
+        if (transaction == null) {
+            throw new AppException("Transaction can't be null",
+             HttpStatus.BAD_REQUEST);
+        }
         Long groupId = transaction.getGroup().getGroupId();
         GroupMember paidBy = transaction.getPaidBy();
         Long amount = transaction.getAmount();

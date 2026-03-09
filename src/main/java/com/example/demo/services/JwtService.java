@@ -18,8 +18,11 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.function.Function;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+
+import com.example.demo.Exception.AppException;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -45,7 +48,7 @@ public class JwtService {
             }
 
         } catch (Exception e) {
-            throw new RuntimeException("Failed to initialize keys", e);
+            throw new AppException("Failed to initialize keys"+e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -65,6 +68,9 @@ public class JwtService {
         try (OutputStream os = Files.newOutputStream(path)) {
             props.store(os, "JWT Keys");
         }
+        catch(Exception e) {
+            throw new AppException("Failed to save keys to file"+e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     private void loadKeysFromFile(Path path) throws Exception {
@@ -74,7 +80,9 @@ public class JwtService {
         try (InputStream is = Files.newInputStream(path)) {
             props.load(is);
         }
-
+        catch(Exception e) {
+            throw new AppException("Failed to load keys from file"+e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
         byte[] publicBytes = Base64.getDecoder().decode(props.getProperty("public"));
         byte[] privateBytes = Base64.getDecoder().decode(props.getProperty("private"));
 

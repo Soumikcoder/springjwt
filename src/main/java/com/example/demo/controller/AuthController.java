@@ -31,7 +31,7 @@ public class AuthController {
     @PostMapping("login")
     public ResponseEntity<Object> login(@RequestBody User user) {
         if (userService.isCorrectCredential(user, authenticationManager)) {
-            return ResponseEntity.ok(userService.generateToken(user));
+            return ResponseEntity.ok(tokenService.generateToken(user));
         }
         return new ResponseEntity<>("Login failed!", HttpStatus.UNAUTHORIZED);
     }
@@ -40,7 +40,7 @@ public class AuthController {
     public ResponseEntity<Map<String, String>> addUser(@RequestBody User user) {
         if (!userService.isExistsUsername(user.getUsername())) {
             userService.registerUser(user);
-            return new ResponseEntity<>(userService.generateToken(user), HttpStatus.CREATED);
+            return new ResponseEntity<>(tokenService.generateToken(user), HttpStatus.CREATED);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
@@ -48,7 +48,7 @@ public class AuthController {
     @PostMapping("refresh")
     public ResponseEntity<Map<String, String>> refresh(@RequestBody RefreshTokenDTO tokenWrapper) {
         String refreshToken = tokenWrapper.refreshToken; 
-        return ResponseEntity.ok(userService.generateToken(refreshToken));
+        return ResponseEntity.ok(tokenService.generateToken(refreshToken));
 
     }
 

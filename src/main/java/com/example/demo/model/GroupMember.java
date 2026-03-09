@@ -1,6 +1,5 @@
 package com.example.demo.model;
 
-import org.hibernate.engine.internal.Cascade;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
