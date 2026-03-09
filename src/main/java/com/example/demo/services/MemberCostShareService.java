@@ -53,7 +53,7 @@ public class MemberCostShareService {
 
     }
 
-    // TODO: write controller for this service and test it
+    
 
     public List<CostShareDTO> getMemberCostSharesByTransactionId(Long transactionId) {
         return memberCostShareRepo.findByTransactionTransactionId(transactionId).stream()

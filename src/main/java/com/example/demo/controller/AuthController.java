@@ -60,7 +60,7 @@ public class AuthController {
 
     @PostMapping("refresh")
     public ResponseEntity<Map<String, String>> refresh(@RequestBody RefreshTokenDTO tokenWrapper) {
-        try {
+
             String refreshToken = tokenWrapper.refreshToken;
 
             if (tokenService.isValidRefreshToken(refreshToken)) {
@@ -72,23 +72,14 @@ public class AuthController {
             }
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+       
 
     }
 
     @PostMapping("logout")
     public ResponseEntity<String> logout(Authentication authentication) {
-        System.out.println("Logging out...");
-        try {
-            tokenService.invalidateRefreshToken(authentication.getName());
-            return new ResponseEntity<>(HttpStatus.ACCEPTED);
-        } catch (Exception e) {
-            System.out.println("Error: " + e);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
+        tokenService.invalidateRefreshToken(authentication.getName());
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
 }

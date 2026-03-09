@@ -1,5 +1,6 @@
 package com.example.demo.dto;
 
+
 public class GroupMemberResponseDTO {
     private Long groupMemberId;
     private String username;
