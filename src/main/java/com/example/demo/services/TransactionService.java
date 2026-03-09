@@ -26,7 +26,7 @@ public class TransactionService {
     MemberCostShareService memberCostShareService;
 
     public void addTransactions(Long groupId, TransactionRequestDTO transactionDTO
-        ,Authentication authentication) throws Exception {
+        ,Authentication authentication) {
         if (!expenseGroupService.existsByGroupID(groupId)) {
             throw new IllegalArgumentException("Group does not exist");
         }

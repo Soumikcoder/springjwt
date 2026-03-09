@@ -1,6 +1,9 @@
 package com.example.demo.services;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -9,6 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.Exception.AppException;
 import com.example.demo.model.MyUserDetails;
 import com.example.demo.model.User;
 import com.example.demo.repo.UserRepo;
@@ -17,8 +21,25 @@ import com.example.demo.repo.UserRepo;
 public class UserService implements UserDetailsService {
     @Autowired
     UserRepo userRepo;
+    @Autowired
+    TokenService tokenService;
 
     BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+
+    public Map<String,String> generateToken(User user){
+        String jwtRefreshToken = tokenService.generateRefreshToken(user.getUsername());
+        String jwtAccessToken = tokenService.generateAccessToken(jwtRefreshToken);
+        return  Map.of("accessToken", jwtAccessToken, "refreshToken", jwtRefreshToken);
+    }
+     public Map<String,String> generateToken(String oldRefreshToken){
+        if (!tokenService.isValidRefreshToken(oldRefreshToken)) {
+            throw new AppException("Invalid refresh token!", HttpStatus.BAD_REQUEST);
+        }
+        String username = tokenService.getUsernameFromRefreshToken(oldRefreshToken);
+        String jwtRefreshToken = tokenService.generateRefreshToken(username);
+        String jwtAccessToken = tokenService.generateAccessToken(jwtRefreshToken);
+        return  Map.of("accessToken", jwtAccessToken, "refreshToken", jwtRefreshToken);
+    }
 
     public User registerUser(User user) {
         if (!userRepo.existsByUsername(user.getUsername())) {

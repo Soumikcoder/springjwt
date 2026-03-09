@@ -26,53 +26,35 @@ public class TransactionController {
 
     @GetMapping("all")
     public ResponseEntity<List<TransactionResponseDTO>> getAllTransactions(@PathVariable Long groupId) {
-        try {
-            return new ResponseEntity<>(transactionService.getTransactionsByGroupId(groupId), HttpStatus.OK);
-        } catch (Exception e) {
-            System.out.println("Error getting transactions for group: " + groupId);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        return new ResponseEntity<>(transactionService.getTransactionsByGroupId(groupId), HttpStatus.OK);
+        
     }
 
     @PostMapping("add")
     public ResponseEntity<TransactionRequestDTO> addTransaction(
             @PathVariable Long groupId, @RequestBody TransactionRequestDTO transactionDTO,
             Authentication authentication
-        ) {
-        try {
-
-            transactionService.addTransactions(groupId, transactionDTO, authentication);
-            return new ResponseEntity<>(transactionDTO, HttpStatus.CREATED);
-        } catch (Exception e) {
-            System.out.println("Adding transaction: " + transactionDTO);
-            System.out.println("Error adding transaction: " + e.getMessage());
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        ) {     
+        transactionService.addTransactions(groupId, transactionDTO, authentication);
+        return new ResponseEntity<>(transactionDTO, HttpStatus.CREATED);
 
     }
 
     @DeleteMapping("{transactionId}/delete")
     public ResponseEntity<String> deleteTransaction(
             @PathVariable Long groupId, @PathVariable Long transactionId) {
-        try {
-            transactionService.removeTransaction(transactionId);
-            return ResponseEntity.ok("Transaction deleted successfully");
-        } catch (Exception e) {
-            System.out.println("Error deleting transaction: " + e.getMessage());
-            return new ResponseEntity<>("Failed to delete transaction", HttpStatus.BAD_REQUEST);
-        }
+        transactionService.removeTransaction(transactionId);
+        return ResponseEntity.ok("Transaction deleted successfully");
+        
     }
 
     @PostMapping("{transactionId}/update")
     public ResponseEntity<TransactionRequestDTO> updateTransaction(
             @PathVariable Long groupId, @PathVariable Long transactionId,
             @RequestBody TransactionRequestDTO transactionRequestDTO) {
-        try {
-            transactionService.updateTransaction(groupId, transactionId, transactionRequestDTO);
-            return new ResponseEntity<>(transactionRequestDTO, HttpStatus.OK);
-        } catch (Exception e) {
-            System.out.println("Error updating transaction: " + e.getMessage());
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        
+        transactionService.updateTransaction(groupId, transactionId, transactionRequestDTO);
+        return new ResponseEntity<>(transactionRequestDTO, HttpStatus.OK);
+        
     }
 }

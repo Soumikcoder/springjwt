@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.GroupMemberResponseDTO;
 import com.example.demo.model.ExpenseGroup;
-import com.example.demo.repo.ExpenseGroupRepo;
 
 import com.example.demo.services.ExpenseGroupService;
 
