@@ -1,0 +1,10 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8080"
+    volumes:
+      - app-data:/app/target/h2db
+volumes:
+  app-data:
+
